@@ -4,28 +4,36 @@
 
 import re, os, xlsxwriter, calendar, time
 ts = calendar.timegm(time.gmtime())
+outpath = "C:\IPMsgParser"
 
-print('##### MsgPopUp Parser by masardi #####')
-print('Masukkan lokasi direktori log yang akan dianalisis...')
+if not os.path.exists(outpath):
+    os.makedirs(outpath)
+
+print("##########################################")
+print("##### MsgPopUp Log Parser by masardi #####")
+print("##########################################")
+print("")
+print("Masukkan lokasi direktori log yang akan dianalisis...")
 path = input("Log directory path : ")
-print('Masukkan nama file output yang diingikan...')
+print("")
+print("Masukkan nama file output yang diinginkan...")
 restname = input("Output filename : ")
 
-log = open("results/error.log","a+")
+log = open(outpath + "/error.log","a+")
 separator = "==============================================================\n"
-thead = "FNAME\tSTAT\tTIME\tFROM\tIP ADDR\tTO\tMESSAGE\tMODE\tATTACHMENT"
+thead = "SOURCE\tSTAT\tTIME\tFROM\tIP ADDR\tTO\tMESSAGE\tMODE\tATTACHMENT"
 
 files = []
 datas = []
 
 for r, d, f in os.walk(path):
     for file in f:
-        if '.txt' in file:
+        if ".txt" in file:
             files.append(file)
 
 i = int(0)
 for f in files:
-    file = open(os.path.join(path,f),"r")
+    file = open(os.path.join(path,f),"r",encoding="cp850")
     contents = file.read()
     segmen = contents.split(separator)
     file.close()
@@ -74,8 +82,8 @@ for f in files:
                         sip = ""
 
                     # Validasi format nama Pengirim
-                    chk = re.compile("([A-Z]|[0-9]){3}\:")
-                    if chk.match(line[0:4]):
+                    
+                    if line.find(':')>1 and line.find(',') < 0:
                         frm = line.replace("[" + sip + "]","")
                         err = "X"
                     else:
@@ -132,7 +140,7 @@ for f in files:
                     datas.append(raw)
 
 # Create a workbook and add a worksheet.
-workbook = xlsxwriter.Workbook('results/' + restname + '_' + str(ts) + '.xlsx')
+workbook = xlsxwriter.Workbook(outpath + '/' + restname + '_' + str(ts) + '.xlsx')
 worksheet = workbook.add_worksheet('Conversation')
 worksheet2 = workbook.add_worksheet('Users')
 
@@ -157,3 +165,8 @@ for data in datas:
         
 workbook.close()
 log.close()
+
+print(str(i) + ' row(s) telah diproses.')
+print('File output telah disimpan di ' + outpath + '/' + restname + '_' + str(ts) + '.xlsx')
+
+input('Press Any Key To Exit.')
