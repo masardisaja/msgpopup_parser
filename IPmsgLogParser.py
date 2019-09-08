@@ -166,7 +166,7 @@ for data in datas:
 workbook.close()
 log.close()
 
-print(str(i) + ' row(s) telah diproses.')
+print(str(i) + ' file(s) telah diproses.')
 print('File output telah disimpan di ' + outpath + '/' + restname + '_' + str(ts) + '.xlsx')
 
 input('Press Any Key To Exit.')
