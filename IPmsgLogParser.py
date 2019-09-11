@@ -167,6 +167,6 @@ workbook.close()
 log.close()
 
 print(str(i) + ' file(s) telah diproses.')
-print('File output telah disimpan di ' + outpath + '\' + restname + '_' + str(ts) + '.xlsx')
+print('File output telah disimpan di ' + outpath + '\\' + restname + '_' + str(ts) + '.xlsx')
 
 input('Press Any Key To Exit.')
