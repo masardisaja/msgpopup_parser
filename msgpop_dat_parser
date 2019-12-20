@@ -1,0 +1,49 @@
+#!/usr/bin/python
+import os
+import sys
+
+file = 'History.dat'
+
+fh = open(file,'rb')
+
+def getSize(filename):
+    st = os.stat(filename)
+    return st.st_size
+
+fsize = getSize(file)
+sys.setrecursionlimit(fsize)
+
+def main():
+    try:
+        s = int('0x300b',0)
+        p = 0
+        fh.seek(s)
+
+        byte = fh.read(1).hex()
+
+        while byte != '':
+            p += 1
+
+            if(byte == '00'):
+                e += 1
+            else:
+                e = 0
+            
+            if(e == 64):
+                break
+            
+        byte = fh.read(p).hex()
+
+        text = bytes.fromhex(byte).decode('utf-8', errors='ignore')
+        text = ''
+
+        print("Start : " + str(s))
+        print("End : " + str(p))
+        print("Content : " + text)
+
+    finally:
+        fh.close
+    fh.close()
+
+if __name__ == "__main__":
+    main()
