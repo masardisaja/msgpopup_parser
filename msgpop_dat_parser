@@ -2,48 +2,78 @@
 import os
 import sys
 
-file = 'History.dat'
-
-fh = open(file,'rb')
+print('Aplikasi Parser Log IP Messenger')
+print('================================================================')
+print('Silakan ketikkan lokasi/path file DAT yang akan diproses...')
+file = input('File path : ')
 
 def getSize(filename):
     st = os.stat(filename)
     return st.st_size
 
 fsize = getSize(file)
+
 sys.setrecursionlimit(fsize)
 
+rlimit = sys.getrecursionlimit()
+s = int('0x300c',0)
+
+fh = open(file, 'rb')
+
+def reader(txt):
+    msg = txt.split('---E.o.M---')
+    f = open(file + ".csv","w+")
+    f.write("\"From\",\"To\",\"Time\",\"Message\"\n")
+    for m in msg:
+        line = m.split('\r\n')
+        ln = 0
+        fr = ''
+        to = ''
+        time = ''
+        mesg = ''
+        for l in line:
+            if(ln==0):
+                fr = l.replace('\n','')
+                fr = fr.replace('From: ','')
+            elif(ln==1):
+                to = l.replace('\n','')
+                to = to.replace('To: ','')
+            elif(ln==2):
+                time = l
+                time = time.replace('Time: ','')
+            else:
+                mesg = mesg + l.replace('\n',' ')
+            ln += 1
+        f.write("\"" + fr + "\",\"" + to + "\",\"" + time + "\",\"" + mesg + "\"\n")
+    f.close
+         
 def main():
     try:
-        s = int('0x300b',0)
-        p = 0
         fh.seek(s)
-
         byte = fh.read(1).hex()
-
-        while byte != '':
-            p += 1
-
-            if(byte == '00'):
-                e += 1
-            else:
-                e = 0
-            
-            if(e == 64):
-                break
-            
-        byte = fh.read(p).hex()
-
-        text = bytes.fromhex(byte).decode('utf-8', errors='ignore')
+        ofs = 0
+        x = 0
         text = ''
-
-        print("Start : " + str(s))
-        print("End : " + str(p))
-        print("Content : " + text)
-
+        while byte != "":
+            if(byte=="00"):
+                x += 1
+            else:
+                x = 0
+                
+            if(x==64):
+                print(str(ofs) + ' : ---X---')
+                break
+            byte = fh.read(1).hex()
+            ofs += 1
     finally:
         fh.close
+        fh.seek(s)
+        ofs = ofs - 62
+        byte = fh.read(ofs).hex()
+        text = bytes.fromhex(byte).decode('utf-8', errors='ignore')
+        text = text.replace('\x00','\n---E.o.M---\n')
+        reader(text)
     fh.close()
-
+    
 if __name__ == "__main__":
-    main()
+        main()
